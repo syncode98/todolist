@@ -10,8 +10,8 @@ const host='0.0.0.0'
 const port=process.env.PORT||3000
 main().catch(err => console.log(err));
 async function main() {
-    await mongoose.connect('mongodb://0.0.0.0:27017/todolistDB');
-    //await mongoose.connect('mongodb+srv://muthu98:muthu98@mutz.lcgql2l.mongodb.net/todolistDB');
+    //await mongoose.connect('mongodb://0.0.0.0:27017/todolistDB');
+    await mongoose.connect('mongodb+srv://muthu98:muthu98@mutz.lcgql2l.mongodb.net/todolistDB');
 
   }
 const itemsSchema= new mongoose.Schema({
