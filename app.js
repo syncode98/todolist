@@ -44,8 +44,7 @@ app.get("/",function(req,res){
    Item.find({}).then(foundItems=>{
     
     if (foundItems.length===0){
-        console.log(foundItems);
-        res.redirect("/")
+        res.render("list",{listTitle:day ,newListItems:defaultItems});
     }else{
         res.render("list",{listTitle:day ,newListItems:foundItems});
     }
