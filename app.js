@@ -2,18 +2,29 @@ const express=require("express");
 const bodyParser=require("body-parser");
 const app=express();
 const date=require(__dirname + "/day.js")
+const dotenv = require("dotenv")
+
+dotenv.config()
 const items=[];
 const workItems=[];
 const mongoose=require("mongoose")
 
-const host='0.0.0.0'
-const port=process.env.PORT||3000
-main().catch(err => console.log(err));
-async function main() {
-    //await mongoose.connect('mongodb://0.0.0.0:27017/todolistDB');
-    await mongoose.connect('mongodb+srv://muthu98:muthu98@mutz.lcgql2l.mongodb.net/todolistDB');
+const host = '0.0.0.0';
+const port = process.env.PORT || 3000
+const uri = process.env.MONGODB_URI;
 
+
+const connectDB = async () => {
+    try {
+      await mongoose.connect(uri)
+  
+      console.log('MongoDB connected!!')
+    } catch (err) {
+      console.log('Failed to connect to MongoDB', err)
+    }
   }
+  connectDB();
+  app.listen(port,host,()=>console.log("Server started"))
 const itemsSchema= new mongoose.Schema({
     name:String,
     })
@@ -24,14 +35,16 @@ const listSchema={
 }
 const List = mongoose.model("List",listSchema)
 const item1 = new Item({
-    name:"Hi!Welcome to the TodoList",
+    name:"Hi! Welcome to the TodoList!",
 })
 const item2 = new Item({
     name:"Add the items that you want to save",
 })
+const item3 = new Item({
+    name:"To delete them, click on the checkbox",
+})
+const defaultItems=[item1,item2,item3]
 
-const defaultItems=[item1,item2]
-Item.insertMany(defaultItems)
 app.set("view engine","ejs")
 app.use(bodyParser.urlencoded({extended:true}))
 app.use(express.static("public"));
@@ -40,17 +53,18 @@ app.use(express.static("public"));
 app.get("/",function(req,res){
     
     const day = date.getDate();
-
-   Item.find({}).then(foundItems=>{
     
-    if (foundItems.length===0){
-        res.render("list",{listTitle:day ,newListItems:defaultItems});
-    }else{
-        res.render("list",{listTitle:day ,newListItems:foundItems});
-    }
+    Item.find().then(foundItems =>{
+       
+        if (foundItems.length===0){
+                res.render("list",{listTitle:day ,newListItems:defaultItems})
+            }else{
+                res.render("list",{listTitle:day ,newListItems:foundItems});
+            }
+})
 
-   })
     
+        
 })
 
 //Redirect to home route when a new item is added since it is only possible to render once
@@ -106,4 +120,3 @@ app.post("/delete",function(req,res){
 app.get("/about",function(req,res){
     res.render("about");
 })
-app.listen(port,host);
